@@ -593,12 +593,14 @@ class Pulse(object):
 				try: pulse_op(self._ctx, *(list(pulse_args) + [cb, None]))
 				except c.ArgumentError as err: raise TypeError(err.args)
 				except c.pa.CallError as err: raise PulseOperationInvalid(err.args[-1])
-		func_args = list(inspect.getargspec(func or (lambda: None)))
+		func = func or (lambda: None)
+		func_args = list(inspect.getfullargspec(func))
 		func_args[0] = list(func_args[0])
 		if index_arg: func_args[0] = ['index'] + func_args[0]
 		_wrapper.__name__ = '...'
-		_wrapper.__doc__ = 'Signature: func' + inspect.formatargspec(*func_args)
+		_wrapper.__doc__ = 'Signature: func' + str(inspect.signature(func))
 		if func.__doc__: _wrapper.__doc__ += '\n\n' + func.__doc__
+		print(_wrapper.__doc__)
 		return _wrapper
 
 	card_profile_set_by_index = _pulse_method_call(
